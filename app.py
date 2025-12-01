@@ -1,5 +1,6 @@
 import streamlit as st
 import streamlit.components.v1 as components
+import textwrap # Thư viện để xử lý lỗi thụt dòng văn bản
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
@@ -9,18 +10,17 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. ADVANCED CSS (DASHBOARD STYLE) ---
+# --- 2. CSS (FIXED LAYOUT) ---
 def inject_dashboard_css():
     st.markdown("""
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap');
 
             :root {
-                --primary-color: #0F172A; /* Slate 900 */
-                --accent-color: #3B82F6;  /* Blue 500 */
-                --bg-color: #F8FAFC;      /* Slate 50 */
+                --primary-color: #0F172A;
+                --accent-color: #3B82F6;
+                --bg-color: #F8FAFC;
                 --card-bg: #FFFFFF;
-                --text-main: #334155;
             }
 
             .stApp {
@@ -28,114 +28,55 @@ def inject_dashboard_css():
                 font-family: 'Inter', sans-serif;
             }
 
-            /* HIDE DEFAULT ELEMENTS */
             #MainMenu, footer, header {visibility: hidden;}
             .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
 
             /* --- HEADER --- */
             .header-container {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 40px;
-                border-bottom: 2px solid #E2E8F0;
-                padding-bottom: 20px;
+                display: flex; justify-content: space-between; align-items: center;
+                margin-bottom: 30px; border-bottom: 2px solid #E2E8F0; padding-bottom: 15px;
             }
             .app-title {
-                font-family: 'Playfair Display', serif;
-                font-size: 2rem;
-                color: var(--primary-color);
-                font-weight: 700;
-                letter-spacing: -0.5px;
+                font-family: 'Playfair Display', serif; font-size: 1.8rem;
+                color: var(--primary-color); font-weight: 700;
             }
             .app-badge {
-                background: #DBEAFE;
-                color: #1E40AF;
-                padding: 6px 16px;
-                border-radius: 20px;
-                font-size: 0.85rem;
-                font-weight: 600;
+                background: #DBEAFE; color: #1E40AF; padding: 5px 12px;
+                border-radius: 20px; font-size: 0.8rem; font-weight: 600;
             }
 
-            /* --- ACTION CARDS (LEFT SIDE) --- */
+            /* --- CARDS --- */
+            /* Quan trọng: CSS cho thẻ HTML bên trái */
             .welcome-box {
                 background: var(--card-bg);
-                padding: 30px;
-                border-radius: 16px;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-                margin-bottom: 20px;
-                border-left: 6px solid var(--accent-color);
+                padding: 25px;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                border-left: 5px solid var(--accent-color);
             }
             .welcome-title {
-                font-size: 1.5rem;
-                font-weight: 600;
-                color: var(--primary-color);
-                margin-bottom: 10px;
-            }
-            .welcome-text {
-                color: #64748B;
-                line-height: 1.6;
-            }
-
-            /* --- QUICK ACTIONS GRID --- */
-            .quick-actions-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-                margin-top: 20px;
-            }
-            .action-card {
-                background: white;
-                border: 1px solid #E2E8F0;
-                padding: 20px;
-                border-radius: 12px;
-                cursor: pointer;
-                transition: all 0.2s;
-                text-align: left;
-            }
-            .action-card:hover {
-                border-color: var(--accent-color);
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-                transform: translateY(-2px);
-            }
-            .action-icon { font-size: 1.5rem; margin-bottom: 10px; display: block; }
-            .action-title { font-weight: 600; color: var(--primary-color); display: block; }
-            .action-desc { font-size: 0.85rem; color: #94A3B8; margin-top: 5px; display: block; }
-
-            /* --- AVATAR CONTAINER (RIGHT SIDE) --- */
-            .avatar-wrapper {
-                background: #FFFFFF;
-                border-radius: 24px;
-                padding: 10px;
-                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-                border: 1px solid #F1F5F9;
-                height: 520px; /* Chiều cao cố định để cân đối layout */
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                position: relative;
-                overflow: hidden;
+                font-size: 1.4rem; font-weight: 600; color: var(--primary-color); margin-bottom: 8px;
             }
             
-            /* Label nhỏ trên avatar */
-            .ai-status {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                background: rgba(16, 185, 129, 0.1);
-                color: #059669;
-                padding: 4px 12px;
-                border-radius: 12px;
-                font-size: 0.75rem;
-                font-weight: 700;
-                z-index: 10;
-                backdrop-filter: blur(4px);
+            /* --- GRID --- */
+            .quick-actions-grid {
+                display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;
             }
+            .action-card {
+                background: #fff; border: 1px solid #E2E8F0; padding: 15px;
+                border-radius: 8px; cursor: pointer; transition: all 0.2s;
+            }
+            .action-card:hover {
+                border-color: var(--accent-color); transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            }
+            .action-title { font-weight: 600; color: var(--primary-color); display: block; font-size: 0.95rem; }
+            .action-desc { font-size: 0.8rem; color: #64748B; margin-top: 4px; display: block; }
 
         </style>
     """, unsafe_allow_html=True)
 
-# --- 3. HEYGEN COMPONENT (FITTED) ---
+# --- 3. HEYGEN COMPONENT (CLEAN VERSION) ---
 def get_heygen_html_snippet():
     return """
     <!DOCTYPE html>
@@ -146,7 +87,7 @@ def get_heygen_html_snippet():
       <title>HeyGen AI</title>
       <style>
         body, html { margin: 0; padding: 0; background: transparent !important; overflow: hidden; height: 100%; width: 100%; }
-        body { display: flex; justify-content: center; align-items: center; }
+        body { display: flex; justify-content: center; align-items: flex-start; } /* Căn lên trên cùng */
       </style>
     </head>
     <body>
@@ -165,11 +106,11 @@ def get_heygen_html_snippet():
           #heygen-streaming-embed {
               z-index: 9999;
               position: absolute;
-              top: 50%; left: 50%;
-              transform: translate(-50%, -50%);
+              top: 50px; /* Đẩy xuống một chút để đẹp hơn */
+              left: 50%;
+              transform: translateX(-50%);
               
-              /* TRẠNG THÁI THU GỌN */
-              width: 160px; height: 160px;
+              width: 170px; height: 170px;
               border-radius: 50%;
               overflow: hidden; 
               
@@ -177,9 +118,8 @@ def get_heygen_html_snippet():
               background-size: cover;
               background-position: center 20%;
               
-              /* Viền tạo cảm giác chuyên nghiệp */
               border: 4px solid #fff;
-              box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+              box-shadow: 0 10px 30px rgba(0,0,0,0.15);
               
               transition: all 0.4s ease;
               opacity: 0; visibility: hidden;
@@ -187,17 +127,15 @@ def get_heygen_html_snippet():
           }
 
           #heygen-streaming-embed:hover {
-              transform: translate(-50%, -50%) scale(1.05);
-              box-shadow: 0 15px 35px rgba(59, 130, 246, 0.2); /* Blue shadow */
+              transform: translateX(-50%) scale(1.05);
+              box-shadow: 0 15px 40px rgba(59, 130, 246, 0.3);
               border-color: #EFF6FF;
           }
 
-          /* KHI MỞ RỘNG - VỪA KHÍT KHUNG BÊN PHẢI */
           #heygen-streaming-embed.expand {
               width: 100% !important; 
               height: 100% !important;
               max-width: 100% !important;
-              max-height: 100% !important;
               border-radius: 0;
               border: none;
               box-shadow: none;
@@ -206,7 +144,6 @@ def get_heygen_html_snippet():
               transform: none;
           }
 
-          #heygen-streaming-container { width: 100%; height: 100%; }
           #heygen-streaming-container iframe { width: 100%; height: 100%; border: 0; position: absolute; top:0; left:0; }
           #heygen-streaming-embed.show { opacity: 1; visibility: visible; }
           `;
@@ -246,71 +183,63 @@ def get_heygen_html_snippet():
     </html>
     """
 
-# --- 4. UI HELPER FUNCTIONS ---
+# --- 4. RENDER UI ---
 def render_header():
     st.markdown("""
         <div class="header-container">
             <div class="app-title">Audit Intelligence Suite</div>
-            <div class="app-badge">Enterprise Edition v2.0</div>
+            <div class="app-badge">Enterprise Edition v2.1</div>
         </div>
     """, unsafe_allow_html=True)
 
 def render_welcome_card():
-    st.markdown("""
+    # SỬ DỤNG TEXTWRAP.DEDENT ĐỂ XÓA KHOẢNG TRẮNG THỪA
+    # Đảm bảo HTML không bị hiểu nhầm là Code block
+    html_content = textwrap.dedent("""
         <div class="welcome-box">
             <div class="welcome-title">Xin chào, Kiểm toán viên.</div>
-            <div class="welcome-text">
-                Hệ thống AI đã sẵn sàng hỗ trợ. Dữ liệu tài chính Q4 đã được đồng bộ. 
-                Bạn muốn bắt đầu từ đâu? Hãy chọn một tác vụ nhanh hoặc kích hoạt 
-                <strong>Trợ lý ảo</strong> bên tay phải để hội thoại trực tiếp.
+            <div style="color: #64748B; margin-bottom: 20px; line-height: 1.5;">
+                Hệ thống AI đã sẵn sàng. Bạn muốn bắt đầu từ đâu? 
+                Chọn tác vụ nhanh bên dưới hoặc kích hoạt <strong>Trợ lý ảo</strong>.
             </div>
             
             <div class="quick-actions-grid">
                 <div class="action-card">
-                    <span class="action-icon">📊</span>
-                    <span class="action-title">Phân tích Báo cáo</span>
-                    <span class="action-desc">Rà soát BCTC & Lưu chuyển tiền tệ</span>
+                    <span class="action-title">📊 Phân tích Báo cáo</span>
+                    <span class="action-desc">Rà soát BCTC & Dòng tiền</span>
                 </div>
                 <div class="action-card">
-                    <span class="action-icon">🛡️</span>
-                    <span class="action-title">Đánh giá Rủi ro</span>
+                    <span class="action-title">🛡️ Đánh giá Rủi ro</span>
                     <span class="action-desc">Kiểm tra tuân thủ & Gian lận</span>
                 </div>
                 <div class="action-card">
-                    <span class="action-icon">📑</span>
-                    <span class="action-title">Tra cứu Luật</span>
-                    <span class="action-desc">Quy định VAS & IFRS mới nhất</span>
+                    <span class="action-title">📑 Tra cứu Luật</span>
+                    <span class="action-desc">Quy định VAS & IFRS</span>
                 </div>
                 <div class="action-card">
-                    <span class="action-icon">✍️</span>
-                    <span class="action-title">Soạn thảo Email</span>
-                    <span class="action-desc">Gửi yêu cầu cung cấp hồ sơ</span>
+                    <span class="action-title">✍️ Soạn thảo Email</span>
+                    <span class="action-desc">Yêu cầu hồ sơ khách hàng</span>
                 </div>
             </div>
         </div>
-    """, unsafe_allow_html=True)
+    """)
+    st.markdown(html_content, unsafe_allow_html=True)
 
-# --- 5. MAIN APP LAYOUT ---
+# --- 5. MAIN APP ---
 def main():
     inject_dashboard_css()
     render_header()
 
-    # Layout chia cột: 60% Nội dung - 40% Avatar
-    # Giúp giao diện cân đối, người dùng vừa làm việc vừa chat được
-    col_content, col_avatar = st.columns([1.4, 1])
+    col_content, col_avatar = st.columns([1.5, 1])
 
     with col_content:
         render_welcome_card()
-        # Mockup một biểu đồ nhỏ hoặc log để trông giống Dashboard thật
-        st.info("💡 Gợi ý: Hôm nay có 3 bút toán cần chú ý tại sổ cái tài khoản 642.")
+        st.info("💡 **Gợi ý:** Có 3 bút toán cần chú ý tại sổ cái tài khoản 642.")
 
     with col_avatar:
-        # Avatar được bọc trong một container riêng biệt, đẹp mắt
-        st.markdown('<div class="avatar-wrapper">', unsafe_allow_html=True)
-        st.markdown('<div class="ai-status">● LIVE</div>', unsafe_allow_html=True)
-        # height 500px là vừa đủ để fit vào khung bên phải
-        components.html(get_heygen_html_snippet(), height=500, scrolling=False)
-        st.markdown('</div>', unsafe_allow_html=True)
+        # Đã xóa div wrapper gây lỗi layout
+        # Giờ đây component sẽ tự căn chỉnh đẹp mắt
+        components.html(get_heygen_html_snippet(), height=550, scrolling=False)
 
 if __name__ == "__main__":
     main()
