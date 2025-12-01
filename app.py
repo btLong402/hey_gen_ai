@@ -1,136 +1,100 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-# --- 1. SETUP PAGE ---
+# --- 1. CONFIGURATION ---
 st.set_page_config(
-    page_title="HeyGen AI Space Core",
-    page_icon="🌌",
+    page_title="Audit Intelligence Assistant",
+    page_icon="xp",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. DEEP SPACE UI & PARTICLE SYSTEM ---
-def inject_space_css():
+# --- 2. CORPORATE CSS (THE "BIG 4" LOOK) ---
+def inject_corporate_css():
     st.markdown("""
         <style>
-            /* IMPORT FONT */
-            @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Exo+2:wght@300;600&display=swap');
+            /* IMPORT PROFESSIONAL FONTS */
+            @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@700&display=swap');
 
-            /* --- BACKGROUND: DEEP SPACE --- */
+            /* --- BACKGROUND: CLEAN & PROFESSIONAL --- */
             .stApp {
-                background-color: #000;
-                background-image: 
-                    radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
-                    radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
-                    radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 20px),
-                    radial-gradient(circle at 50% 50%, rgba(20, 30, 50, 0.5) 0%, rgba(0,0,0,0) 70%);
-                background-size: 550px 550px, 350px 350px, 250px 250px, 100% 100%;
-                background-position: 0 0, 40px 60px, 130px 270px, center;
-                animation: spaceMove 120s linear infinite;
+                background-color: #f4f6f9; /* Xám xanh nhạt rất dịu mắt */
+                background-image: linear-gradient(135deg, #f4f6f9 0%, #eef2f3 100%);
+                font-family: 'Lato', sans-serif;
+                color: #2c3e50;
+            }
+
+            /* ẨN UI THỪA */
+            #MainMenu, footer, header {visibility: hidden;}
+            .block-container { padding-top: 3rem; padding-bottom: 0rem; max-width: 100%; }
+
+            /* --- HEADER SECTION --- */
+            .audit-header {
+                text-align: center;
+                margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #d1d8e0;
+            }
+
+            .audit-title {
+                font-family: 'Playfair Display', serif; /* Font có chân tạo uy quyền */
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: #0f2027; /* Deep Navy */
+                margin: 0;
+                letter-spacing: 0.5px;
+            }
+
+            .audit-subtitle {
+                font-family: 'Lato', sans-serif;
+                font-size: 0.95rem;
+                color: #57606f;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                margin-top: 5px;
+            }
+
+            /* --- PROFESSIONAL CARD --- */
+            .corp-card {
+                background: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Bóng đổ rất nhẹ */
+                border-left: 5px solid #205072; /* Đường viền xanh bên trái tạo điểm nhấn */
+                padding: 20px 40px;
+                max-width: 700px;
+                margin: 0 auto 30px auto;
+                text-align: center;
+            }
+
+            .corp-card p {
+                margin: 0;
+                font-size: 1rem;
+                color: #333;
+                line-height: 1.6;
             }
             
-            @keyframes spaceMove {
-                from { background-position: 0 0, 40px 60px, 130px 270px, center; }
-                to { background-position: 550px 550px, 390px 410px, 380px 520px, center; }
-            }
-
-            /* --- PARTICLE CANVAS --- */
-            #particle-canvas {
-                position: fixed;
-                top: 0; left: 0; width: 100%; height: 100%;
-                pointer-events: none;
-                z-index: 0; /* Đặt thấp nhất để không che Avatar */
-                mix-blend-mode: screen;
-            }
-
-            /* UI CLEANUP */
-            #MainMenu, footer, header {visibility: hidden;}
-            .block-container { padding-top: 2rem; padding-bottom: 0rem; max-width: 100%; }
-
-            /* TYPOGRAPHY */
-            .space-title {
-                font-family: 'Orbitron', sans-serif;
-                text-align: center;
-                font-size: 3rem;
+            .highlight-text {
+                color: #205072;
                 font-weight: 700;
-                background: linear-gradient(to bottom, #fff, #87ceeb);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                text-shadow: 0 0 20px rgba(135, 206, 235, 0.8);
-                letter-spacing: 6px;
-                margin-bottom: 5px;
-                position: relative; z-index: 10;
             }
-            .space-subtitle {
-                font-family: 'Exo 2', sans-serif;
-                text-align: center;
-                color: #aaddff;
-                font-size: 1rem;
-                letter-spacing: 2px;
-                opacity: 0.8;
-                position: relative; z-index: 10;
-            }
-        </style>
-        
-        <canvas id="particle-canvas"></canvas>
-        <script>
-            /* --- PARTICLE SYSTEM LOGIC (Giữ nguyên hiệu ứng sao băng) --- */
-            const canvas = document.getElementById('particle-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            let particlesArray = [];
-            const colors = ['#ffffff', '#87ceeb', '#e0ffff', '#b0e0e6'];
 
-            window.addEventListener('resize', function(){
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-            const mouse = { x: undefined, y: undefined };
-            window.addEventListener('mousemove', function(event){
-                mouse.x = event.x;
-                mouse.y = event.y;
-                for (let i = 0; i < 3; i++) particlesArray.push(new Particle());
-            });
-            class Particle {
-                constructor(){
-                    this.x = mouse.x; this.y = mouse.y;
-                    this.size = Math.random() * 3 + 1;
-                    this.speedX = Math.random() * 2 - 1;
-                    this.speedY = Math.random() * 2 - 1;
-                    this.color = colors[Math.floor(Math.random() * colors.length)];
-                    this.life = 1.0;
-                }
-                update(){
-                    this.x += this.speedX; this.y += this.speedY;
-                    if (this.size > 0.2) this.size -= 0.05;
-                    this.life -= 0.02;
-                }
-                draw(){
-                    ctx.fillStyle = this.color; ctx.globalAlpha = this.life;
-                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill(); ctx.globalAlpha = 1.0;
-                }
+            /* --- STATUS BADGE --- */
+            .status-badge {
+                display: inline-block;
+                margin-top: 10px;
+                padding: 4px 12px;
+                background-color: #e8f5e9;
+                color: #2e7d32;
+                border-radius: 100px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                border: 1px solid #c8e6c9;
             }
-            function handleParticles(){
-                for (let i = 0; i < particlesArray.length; i++){
-                    particlesArray[i].update(); particlesArray[i].draw();
-                    if (particlesArray[i].size <= 0.3 || particlesArray[i].life <= 0){
-                        particlesArray.splice(i, 1); i--;
-                    }
-                }
-            }
-            function animate(){
-                ctx.fillStyle = 'rgba(0,0,0,0.1)'; 
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                handleParticles();
-                requestAnimationFrame(animate);
-            }
-            animate();
-        </script>
+
+        </style>
     """, unsafe_allow_html=True)
 
-# --- 3. HEYGEN COMPONENT (BUG FIXED VERSION) ---
+# --- 3. HEYGEN COMPONENT (OFFICE STYLE) ---
 def get_heygen_html_snippet():
     return """
     <!DOCTYPE html>
@@ -140,7 +104,6 @@ def get_heygen_html_snippet():
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>HeyGen AI</title>
       <style>
-        /* Đảm bảo HTML/Body trong suốt hoàn toàn */
         body, html { margin: 0; padding: 0; background: transparent !important; overflow: hidden; height: 100%; width: 100%; }
         body { display: flex; justify-content: center; align-items: center; }
       </style>
@@ -160,13 +123,13 @@ def get_heygen_html_snippet():
           const stylesheet = document.createElement("style");
           stylesheet.innerHTML = `
           #heygen-streaming-embed {
-              z-index: 2147483647; /* Lớp cao nhất có thể */
+              z-index: 2147483647;
               position: absolute;
               top: 50%; left: 50%;
               transform: translate(-50%, -50%);
               
-              /* TRẠNG THÁI THU GỌN: HÌNH TRÒN */
-              width: 150px; height: 150px;
+              /* STYLE CHO TRẠNG THÁI THU GỌN: CHUYÊN NGHIỆP */
+              width: 140px; height: 140px;
               border-radius: 50%;
               overflow: hidden; 
               
@@ -174,45 +137,42 @@ def get_heygen_html_snippet():
               background-image: url('https://files2.heygen.ai/avatar/v3/74447a27859a456c955e01f21ef18216_45620/preview_talk_1.webp');
               background-size: cover;
               background-position: center 20%;
-              background-repeat: no-repeat;
-
-              border: 3px solid rgba(135, 206, 235, 0.5);
-              box-shadow: 0 0 40px rgba(135, 206, 235, 0.4);
-              transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+              
+              /* Viền kép tạo cảm giác trang trọng */
+              border: 4px solid #fff;
+              box-shadow: 0 8px 24px rgba(32, 80, 114, 0.25); /* Bóng màu xanh navy */
+              
+              transition: all 0.4s ease;
               opacity: 0; visibility: hidden;
               cursor: pointer;
           }
 
-          /* TRẠNG THÁI MỞ RỘNG (EXPAND) - SỬA LỖI Ở ĐÂY */
+          /* Hiệu ứng Hover nhẹ nhàng, lịch sự */
+          #heygen-streaming-embed:hover {
+              transform: translate(-50%, -50%) scale(1.05);
+              box-shadow: 0 12px 30px rgba(32, 80, 114, 0.35);
+              border-color: #f1f2f6;
+          }
+
+          /* TRẠNG THÁI MỞ RỘNG (EXPAND) */
           #heygen-streaming-embed.expand {
               width: 100% !important; 
               height: 100% !important;
               max-width: 100% !important;
               max-height: 100% !important;
               
-              border-radius: 0; /* Bỏ bo góc để full màn hình iframe */
+              border-radius: 0;
               border: none;
               box-shadow: none;
-              
-              /* QUAN TRỌNG: Nền trong suốt thay vì màu đen */
               background: transparent; 
               background-image: none;
               
-              /* Đặt lại vị trí để lấp đầy iframe */
               top: 0; left: 0;
               transform: none;
-              overflow: visible; /* Cho phép nội dung hiển thị hết */
           }
 
-          #heygen-streaming-container {
-              width: 100%; height: 100%;
-          }
-          
-          #heygen-streaming-container iframe { 
-              width: 100%; height: 100%; 
-              border: 0; 
-              position: absolute; top:0; left:0;
-          }
+          #heygen-streaming-container { width: 100%; height: 100%; }
+          #heygen-streaming-container iframe { width: 100%; height: 100%; border: 0; position: absolute; top:0; left:0; }
           
           #heygen-streaming-embed.show { opacity: 1; visibility: visible; }
           `;
@@ -254,15 +214,31 @@ def get_heygen_html_snippet():
 
 # --- 4. MAIN APP ---
 def main():
-    inject_space_css()
+    inject_corporate_css()
 
-    st.markdown('<div class="space-title">GALACTIC AI INTERFACE</div>', unsafe_allow_html=True)
-    st.markdown('<div class="space-subtitle">SYSTEM ONLINE | INITIALIZING NEURAL LINK...</div>', unsafe_allow_html=True)
+    # HEADER: Logo và Tên hệ thống
+    st.markdown("""
+        <div class="audit-header">
+            <h1 class="audit-title">AUDIT INTELLIGENCE SUITE</h1>
+            <div class="audit-subtitle">Financial Analysis &bullet; Risk Assurance &bullet; Compliance</div>
+        </div>
+    """, unsafe_allow_html=True)
 
-    # Avatar Section
-    col1, col2, col3 = st.columns([1, 10, 1])
+    # INFO CARD: Hướng dẫn ngắn gọn
+    st.markdown("""
+        <div class="corp-card">
+            <p>Chào bạn, tôi là <span class="highlight-text">Trợ lý Kiểm toán Ảo</span>.</p>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 5px;">
+                Vui lòng nhấn vào hình đại diện bên dưới để bắt đầu phiên tư vấn.
+            </p>
+            <div class="status-badge">● System Online: Secure Connection</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # AVATAR SECTION
+    col1, col2, col3 = st.columns([1, 8, 1])
     with col2:
-        # height=550 là chiều cao an toàn để hiển thị đầy đủ avatar bán thân
+        # height=550 là chuẩn cho desktop làm việc văn phòng
         components.html(get_heygen_html_snippet(), height=550, scrolling=False)
 
 if __name__ == "__main__":
