@@ -87,135 +87,135 @@ def inject_immersive_css():
     """, unsafe_allow_html=True)
 
 # --- 3. HEYGEN COMPONENT (CENTERED VERSION) ---
-    def get_heygen_html_snippet():
-        return """
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>HeyGen AI</title>
-        <style>
-            body, html { margin: 0; padding: 0; background-color: transparent; overflow: hidden; font-family: 'Inter', sans-serif; height: 100%; }
-            /* Căn giữa nội dung trong body */
-            body { display: flex; justify-content: center; align-items: center; }
-        </style>
-        </head>
-        <body>
-        <script>
-        !function(window){
-            const host = "https://labs.heygen.com";
-            const url=host+"/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJKdW5lX0hSX3B1YmxpYyIsInByZXZpZXdJ%0D%0AbWciOiJodHRwczovL2ZpbGVzMi5oZXlnZW4uYWkvYXZhdGFyL3YzLzc0NDQ3YTI3ODU5YTQ1NmM5%0D%0ANTVlMDFmMjFlZjE4MjE2XzQ1NjIwL3ByZXZpZXdfdGFsa18xLndlYnAiLCJuZWVkUmVtb3ZlQmFj%0D%0Aa2dyb3VuZCI6ZmFsc2UsImtub3dsZWRnZUJhc2VJZCI6IjYxZGViMDRmMzdmZjRmMmVhMTY0ZGM3%0D%0AMDcyYjcwNWIyIiwidXNlcm5hbWUiOiI5NWJmMjIyOTk4NWQ0MWVlYjAwNWY3ZjUyNzVmZDZjZSJ9&inIFrame=1";
+def get_heygen_html_snippet():
+    return """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>HeyGen AI</title>
+      <style>
+        body, html { margin: 0; padding: 0; background-color: transparent; overflow: hidden; font-family: 'Inter', sans-serif; height: 100%; }
+        /* Căn giữa nội dung trong body */
+        body { display: flex; justify-content: center; align-items: center; }
+      </style>
+    </head>
+    <body>
+      <script>
+      !function(window){
+          const host = "https://labs.heygen.com";
+          const url=host+"/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJKdW5lX0hSX3B1YmxpYyIsInByZXZpZXdJ%0D%0AbWciOiJodHRwczovL2ZpbGVzMi5oZXlnZW4uYWkvYXZhdGFyL3YzLzc0NDQ3YTI3ODU5YTQ1NmM5%0D%0ANTVlMDFmMjFlZjE4MjE2XzQ1NjIwL3ByZXZpZXdfdGFsa18xLndlYnAiLCJuZWVkUmVtb3ZlQmFj%0D%0Aa2dyb3VuZCI6ZmFsc2UsImtub3dsZWRnZUJhc2VJZCI6IjYxZGViMDRmMzdmZjRmMmVhMTY0ZGM3%0D%0AMDcyYjcwNWIyIiwidXNlcm5hbWUiOiI5NWJmMjIyOTk4NWQ0MWVlYjAwNWY3ZjUyNzVmZDZjZSJ9&inIFrame=1";
 
-            const clientWidth = document.body.clientWidth;
-            const wrapDiv = document.createElement("div");
-            wrapDiv.id = "heygen-streaming-embed";
+          const clientWidth = document.body.clientWidth;
+          const wrapDiv = document.createElement("div");
+          wrapDiv.id = "heygen-streaming-embed";
 
-            const container = document.createElement("div");
-            container.id = "heygen-streaming-container";
+          const container = document.createElement("div");
+          container.id = "heygen-streaming-container";
 
-            const stylesheet = document.createElement("style");
-            stylesheet.innerHTML = `
-            #heygen-streaming-embed {
-                z-index: 9999;
-                position: absolute;
-                
-                /* --- THUẬT TOÁN CĂN GIỮA TUYỆT ĐỐI --- */
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                /* ------------------------------------- */
-                
-                width: 180px;
-                height: 180px;
-                border-radius: 50%;
-                
-                border: 2px solid rgba(255, 255, 255, 0.3);
-                box-shadow: 0 0 50px rgba(100, 181, 246, 0.4), inset 0 0 20px rgba(255,255,255,0.1);
-                
-                transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Hiệu ứng nảy (bouncy) */
-                overflow: hidden;
-                opacity: 0;
-                visibility: hidden;
-                
-                background-image: url('https://files2.heygen.ai/avatar/v3/74447a27859a456c955e01f21ef18216_45620/preview_talk_1.webp');
-                background-size: cover;
-                background-position: center;
-                cursor: pointer;
-            }
-            
-            #heygen-streaming-embed:hover {
-                box-shadow: 0 0 80px rgba(100, 181, 246, 0.8);
-                transform: translate(-50%, -50%) scale(1.1); /* Phóng to từ tâm */
-            }
+          const stylesheet = document.createElement("style");
+          stylesheet.innerHTML = `
+          #heygen-streaming-embed {
+              z-index: 9999;
+              position: absolute;
+              
+              /* --- THUẬT TOÁN CĂN GIỮA TUYỆT ĐỐI --- */
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              /* ------------------------------------- */
+              
+              width: 180px;
+              height: 180px;
+              border-radius: 50%;
+              
+              border: 2px solid rgba(255, 255, 255, 0.3);
+              box-shadow: 0 0 50px rgba(100, 181, 246, 0.4), inset 0 0 20px rgba(255,255,255,0.1);
+              
+              transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Hiệu ứng nảy (bouncy) */
+              overflow: hidden;
+              opacity: 0;
+              visibility: hidden;
+              
+              background-image: url('https://files2.heygen.ai/avatar/v3/74447a27859a456c955e01f21ef18216_45620/preview_talk_1.webp');
+              background-size: cover;
+              background-position: center;
+              cursor: pointer;
+          }
+          
+          #heygen-streaming-embed:hover {
+              box-shadow: 0 0 80px rgba(100, 181, 246, 0.8);
+              transform: translate(-50%, -50%) scale(1.1); /* Phóng to từ tâm */
+          }
 
-            #heygen-streaming-embed.show {
-                opacity: 1;
-                visibility: visible;
-            }
+          #heygen-streaming-embed.show {
+              opacity: 1;
+              visibility: visible;
+          }
 
-            #heygen-streaming-embed.expand {
-                /* Khi mở rộng, vẫn giữ căn giữa và phóng to full khung */
-                width: 100%;
-                height: 100%;
-                max-width: 100%;
-                max-height: 100%;
-                
-                top: 0;
-                left: 0;
-                transform: none; /* Bỏ căn giữa để full màn hình iframe */
-                
-                border-radius: 12px;
-                border: none;
-                background-color: transparent;
-                box-shadow: none;
-            }
+          #heygen-streaming-embed.expand {
+              /* Khi mở rộng, vẫn giữ căn giữa và phóng to full khung */
+              width: 100%;
+              height: 100%;
+              max-width: 100%;
+              max-height: 100%;
+              
+              top: 0;
+              left: 0;
+              transform: none; /* Bỏ căn giữa để full màn hình iframe */
+              
+              border-radius: 12px;
+              border: none;
+              background-color: transparent;
+              box-shadow: none;
+          }
 
-            #heygen-streaming-container {
-                width: 100%;
-                height: 100%;
-            }
-            #heygen-streaming-container iframe {
-                width: 100%;
-                height: 100%;
-                border: 0;
-            }
-            `;
+          #heygen-streaming-container {
+              width: 100%;
+              height: 100%;
+          }
+          #heygen-streaming-container iframe {
+              width: 100%;
+              height: 100%;
+              border: 0;
+          }
+          `;
 
-            const iframe = document.createElement("iframe");
-            iframe.allowFullscreen = false;
-            iframe.title = "Streaming Embed";
-            iframe.role = "dialog";
-            iframe.allow = "microphone";
-            iframe.src = url;
+          const iframe = document.createElement("iframe");
+          iframe.allowFullscreen = false;
+          iframe.title = "Streaming Embed";
+          iframe.role = "dialog";
+          iframe.allow = "microphone";
+          iframe.src = url;
 
-            let visible = false;
-            let initial = false;
+          let visible = false;
+          let initial = false;
 
-            window.addEventListener("message", (e) => {
-                if (e.origin === host && e.data && e.data.type === "streaming-embed") {
-                    if (e.data.action === "init") {
-                        initial = true;
-                        wrapDiv.classList.toggle("show", initial);
-                    } else if (e.data.action === "show") {
-                        visible = true;
-                        wrapDiv.classList.toggle("expand", visible);
-                    } else if (e.data.action === "hide") {
-                        visible = false;
-                        wrapDiv.classList.toggle("expand", visible);
-                    }
-                }
-            });
+          window.addEventListener("message", (e) => {
+              if (e.origin === host && e.data && e.data.type === "streaming-embed") {
+                  if (e.data.action === "init") {
+                      initial = true;
+                      wrapDiv.classList.toggle("show", initial);
+                  } else if (e.data.action === "show") {
+                      visible = true;
+                      wrapDiv.classList.toggle("expand", visible);
+                  } else if (e.data.action === "hide") {
+                      visible = false;
+                      wrapDiv.classList.toggle("expand", visible);
+                  }
+              }
+          });
 
-            container.appendChild(iframe);
-            wrapDiv.appendChild(stylesheet);
-            wrapDiv.appendChild(container);
-            document.body.appendChild(wrapDiv);
-        }(globalThis);
-        </script>
-        </body>
-        </html>
-        """
+          container.appendChild(iframe);
+          wrapDiv.appendChild(stylesheet);
+          wrapDiv.appendChild(container);
+          document.body.appendChild(wrapDiv);
+      }(globalThis);
+      </script>
+    </body>
+    </html>
+    """
 # --- 4. MAIN APP LOGIC ---
 def main():
     inject_immersive_css()
