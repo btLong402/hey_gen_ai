@@ -9,108 +9,71 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CSS & JS: THE DIGITAL LEDGER THEME ---
+# --- 2. THEME: DIGITAL LEDGER (SPOTLIGHT EFFECT) ---
 def inject_focus_theme():
     st.markdown("""
         <style>
-            /* IMPORT FONT */
             @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap');
 
             :root {
-                --bg-color: #0f172a;       /* Navy Blue đậm (Slate 900) */
+                --bg-color: #0f172a;       /* Navy Blue đậm */
                 --grid-color: #1e293b;     /* Slate 800 */
-                --spotlight-color: rgba(56, 189, 248, 0.15); /* Light Blue Glow */
+                --spotlight-color: rgba(56, 189, 248, 0.1); /* Light Blue Glow nhẹ */
             }
 
-            /* --- BACKGROUND SYSTEM --- */
             .stApp {
                 background-color: var(--bg-color);
                 font-family: 'Manrope', sans-serif;
             }
 
-            /* Lớp nền lưới (Grid Pattern) cố định */
+            /* NỀN LƯỚI */
             .audit-grid-bg {
-                position: fixed;
-                top: 0; left: 0; width: 100vw; height: 100vh;
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
                 background-image: 
                     linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
                     linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
-                background-size: 40px 40px; /* Kích thước ô lưới */
-                z-index: 0;
-                pointer-events: none;
+                background-size: 40px 40px;
+                z-index: 0; pointer-events: none;
             }
 
-            /* Lớp Spotlight di chuyển theo chuột */
+            /* SPOTLIGHT THEO CHUỘT */
             .spotlight-layer {
-                position: fixed;
-                top: 0; left: 0; width: 100vw; height: 100vh;
-                /* Radial Gradient sẽ được cập nhật vị trí bởi JS */
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
                 background: radial-gradient(
                     600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-                    var(--spotlight-color), 
-                    transparent 40%
+                    var(--spotlight-color), transparent 40%
                 );
-                z-index: 1;
-                pointer-events: none;
+                z-index: 1; pointer-events: none;
             }
 
             /* ẨN UI THỪA */
             #MainMenu, footer, header {visibility: hidden;}
-            .block-container { 
-                padding-top: 5vh; 
-                max-width: 100%; 
-                position: relative; 
-                z-index: 10; /* Nội dung phải nổi lên trên nền */
-            }
+            .block-container { padding-top: 5vh; max-width: 100%; position: relative; z-index: 10; }
 
-            /* --- TYPOGRAPHY --- */
-            .title-container {
-                text-align: center;
-                margin-bottom: 20px;
-            }
-            
+            /* TYPOGRAPHY */
+            .title-container { text-align: center; margin-bottom: 20px; }
             .main-title {
-                font-size: 2.5rem;
-                font-weight: 800;
-                color: #f8fafc;
-                letter-spacing: -1px;
-                text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+                font-size: 2.5rem; font-weight: 800; color: #f8fafc;
+                letter-spacing: -1px; text-shadow: 0 4px 20px rgba(0,0,0,0.5);
             }
-
             .sub-title {
-                color: #94a3b8;
-                font-size: 1rem;
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                margin-top: 5px;
+                color: #94a3b8; font-size: 1rem; letter-spacing: 2px;
+                text-transform: uppercase; margin-top: 5px;
             }
-            
             .status-pill {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                background: rgba(15, 23, 42, 0.6);
-                border: 1px solid #334155;
-                padding: 8px 16px;
-                border-radius: 99px;
-                color: #38bdf8;
-                font-size: 0.8rem;
-                margin-top: 20px;
-                backdrop-filter: blur(4px);
+                display: inline-flex; align-items: center; gap: 8px;
+                background: rgba(15, 23, 42, 0.8); border: 1px solid #334155;
+                padding: 8px 16px; border-radius: 99px; color: #38bdf8;
+                font-size: 0.8rem; margin-top: 20px; backdrop-filter: blur(4px);
             }
             .pulse-dot {
-                width: 8px; height: 8px;
-                background-color: #38bdf8;
-                border-radius: 50%;
-                box-shadow: 0 0 10px #38bdf8;
+                width: 8px; height: 8px; background-color: #38bdf8;
+                border-radius: 50%; box-shadow: 0 0 10px #38bdf8;
                 animation: pulse 2s infinite;
             }
             @keyframes pulse {
-                0% { opacity: 1; transform: scale(1); }
-                50% { opacity: 0.5; transform: scale(0.8); }
-                100% { opacity: 1; transform: scale(1); }
+                0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; }
             }
-
         </style>
 
         <div class="audit-grid-bg"></div>
@@ -118,19 +81,14 @@ def inject_focus_theme():
 
         <script>
             const spotlight = document.getElementById('spotlight');
-            
-            // Hàm cập nhật vị trí spotlight
             document.addEventListener('mousemove', (e) => {
-                const x = e.clientX;
-                const y = e.clientY;
-                // Cập nhật biến CSS
-                spotlight.style.setProperty('--mouse-x', x + 'px');
-                spotlight.style.setProperty('--mouse-y', y + 'px');
+                spotlight.style.setProperty('--mouse-x', e.clientX + 'px');
+                spotlight.style.setProperty('--mouse-y', e.clientY + 'px');
             });
         </script>
     """, unsafe_allow_html=True)
 
-# --- 3. HEYGEN COMPONENT (CENTERED FOCUS) ---
+# --- 3. HEYGEN COMPONENT (FIXED VISIBILITY) ---
 def get_heygen_html_snippet():
     return """
     <!DOCTYPE html>
@@ -163,7 +121,7 @@ def get_heygen_html_snippet():
               top: 50%; left: 50%;
               transform: translate(-50%, -50%);
               
-              /* TRẠNG THÁI THU GỌN: PROFESSIONAL ORB */
+              /* TRẠNG THÁI THU GỌN */
               width: 160px; height: 160px;
               border-radius: 50%;
               overflow: hidden; 
@@ -172,7 +130,6 @@ def get_heygen_html_snippet():
               background-size: cover;
               background-position: center 20%;
               
-              /* Viền phát sáng nhẹ kiểu Cyber-Security */
               border: 2px solid rgba(56, 189, 248, 0.5);
               box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
               
@@ -181,22 +138,25 @@ def get_heygen_html_snippet():
               cursor: pointer;
           }
 
-          /* Hiệu ứng Hover: Nổi bật hơn */
           #heygen-streaming-embed:hover {
               transform: translate(-50%, -50%) scale(1.08);
               box-shadow: 0 0 50px rgba(56, 189, 248, 0.4);
               border-color: #38bdf8;
           }
 
-          /* TRẠNG THÁI MỞ RỘNG: FULL FOCUS */
+          /* --- SỬA LỖI MỜ Ở ĐÂY --- */
           #heygen-streaming-embed.expand {
               width: 100% !important; 
               height: 100% !important;
               max-width: 100% !important;
-              border-radius: 12px;
+              
+              border-radius: 8px; /* Bo góc nhẹ cho đẹp */
               border: 1px solid rgba(56, 189, 248, 0.3);
-              background: rgba(15, 23, 42, 0.8); /* Nền tối mờ nhẹ phía sau avatar */
-              backdrop-filter: blur(10px);
+              
+              /* FIX: Bỏ background màu và bỏ backdrop-filter */
+              background: transparent !important;
+              backdrop-filter: none !important;
+              
               top: 0; left: 0;
               transform: none;
               box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -245,10 +205,9 @@ def get_heygen_html_snippet():
 def main():
     inject_focus_theme()
 
-    # SECTION: Title (Đơn giản, tinh tế)
     st.markdown("""
         <div class="title-container">
-            <div class="sub-title">Audit Intelligence V3.0</div>
+            <div class="sub-title">Audit Intelligence V3.1</div>
             <div class="main-title">VIRTUAL AUDIT ASSISTANT</div>
             <div class="status-pill">
                 <div class="pulse-dot"></div>
@@ -257,12 +216,8 @@ def main():
         </div>
     """, unsafe_allow_html=True)
 
-    # SECTION: Avatar (Trung tâm)
-    # Dùng 3 cột để căn giữa tuyệt đối
     col1, col2, col3 = st.columns([1, 6, 1])
-    
     with col2:
-        # Tăng chiều cao lên 600px để khi mở rộng nhìn rất đã mắt
         components.html(get_heygen_html_snippet(), height=600, scrolling=False)
 
 if __name__ == "__main__":
