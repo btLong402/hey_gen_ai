@@ -1,82 +1,136 @@
 import streamlit as st
 import streamlit.components.v1 as components
-import textwrap # Thư viện để xử lý lỗi thụt dòng văn bản
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
-    page_title="Audit Intelligence Workspace",
-    page_icon="⚖️",
+    page_title="Audit Focus Mode",
+    page_icon="🔍",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CSS (FIXED LAYOUT) ---
-def inject_dashboard_css():
+# --- 2. CSS & JS: THE DIGITAL LEDGER THEME ---
+def inject_focus_theme():
     st.markdown("""
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap');
+            /* IMPORT FONT */
+            @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap');
 
             :root {
-                --primary-color: #0F172A;
-                --accent-color: #3B82F6;
-                --bg-color: #F8FAFC;
-                --card-bg: #FFFFFF;
+                --bg-color: #0f172a;       /* Navy Blue đậm (Slate 900) */
+                --grid-color: #1e293b;     /* Slate 800 */
+                --spotlight-color: rgba(56, 189, 248, 0.15); /* Light Blue Glow */
             }
 
+            /* --- BACKGROUND SYSTEM --- */
             .stApp {
                 background-color: var(--bg-color);
-                font-family: 'Inter', sans-serif;
+                font-family: 'Manrope', sans-serif;
             }
 
+            /* Lớp nền lưới (Grid Pattern) cố định */
+            .audit-grid-bg {
+                position: fixed;
+                top: 0; left: 0; width: 100vw; height: 100vh;
+                background-image: 
+                    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+                background-size: 40px 40px; /* Kích thước ô lưới */
+                z-index: 0;
+                pointer-events: none;
+            }
+
+            /* Lớp Spotlight di chuyển theo chuột */
+            .spotlight-layer {
+                position: fixed;
+                top: 0; left: 0; width: 100vw; height: 100vh;
+                /* Radial Gradient sẽ được cập nhật vị trí bởi JS */
+                background: radial-gradient(
+                    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                    var(--spotlight-color), 
+                    transparent 40%
+                );
+                z-index: 1;
+                pointer-events: none;
+            }
+
+            /* ẨN UI THỪA */
             #MainMenu, footer, header {visibility: hidden;}
-            .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
-
-            /* --- HEADER --- */
-            .header-container {
-                display: flex; justify-content: space-between; align-items: center;
-                margin-bottom: 30px; border-bottom: 2px solid #E2E8F0; padding-bottom: 15px;
-            }
-            .app-title {
-                font-family: 'Playfair Display', serif; font-size: 1.8rem;
-                color: var(--primary-color); font-weight: 700;
-            }
-            .app-badge {
-                background: #DBEAFE; color: #1E40AF; padding: 5px 12px;
-                border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+            .block-container { 
+                padding-top: 5vh; 
+                max-width: 100%; 
+                position: relative; 
+                z-index: 10; /* Nội dung phải nổi lên trên nền */
             }
 
-            /* --- CARDS --- */
-            /* Quan trọng: CSS cho thẻ HTML bên trái */
-            .welcome-box {
-                background: var(--card-bg);
-                padding: 25px;
-                border-radius: 12px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-                border-left: 5px solid var(--accent-color);
-            }
-            .welcome-title {
-                font-size: 1.4rem; font-weight: 600; color: var(--primary-color); margin-bottom: 8px;
+            /* --- TYPOGRAPHY --- */
+            .title-container {
+                text-align: center;
+                margin-bottom: 20px;
             }
             
-            /* --- GRID --- */
-            .quick-actions-grid {
-                display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;
+            .main-title {
+                font-size: 2.5rem;
+                font-weight: 800;
+                color: #f8fafc;
+                letter-spacing: -1px;
+                text-shadow: 0 4px 20px rgba(0,0,0,0.5);
             }
-            .action-card {
-                background: #fff; border: 1px solid #E2E8F0; padding: 15px;
-                border-radius: 8px; cursor: pointer; transition: all 0.2s;
+
+            .sub-title {
+                color: #94a3b8;
+                font-size: 1rem;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                margin-top: 5px;
             }
-            .action-card:hover {
-                border-color: var(--accent-color); transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            
+            .status-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: rgba(15, 23, 42, 0.6);
+                border: 1px solid #334155;
+                padding: 8px 16px;
+                border-radius: 99px;
+                color: #38bdf8;
+                font-size: 0.8rem;
+                margin-top: 20px;
+                backdrop-filter: blur(4px);
             }
-            .action-title { font-weight: 600; color: var(--primary-color); display: block; font-size: 0.95rem; }
-            .action-desc { font-size: 0.8rem; color: #64748B; margin-top: 4px; display: block; }
+            .pulse-dot {
+                width: 8px; height: 8px;
+                background-color: #38bdf8;
+                border-radius: 50%;
+                box-shadow: 0 0 10px #38bdf8;
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.5; transform: scale(0.8); }
+                100% { opacity: 1; transform: scale(1); }
+            }
 
         </style>
+
+        <div class="audit-grid-bg"></div>
+        <div class="spotlight-layer" id="spotlight"></div>
+
+        <script>
+            const spotlight = document.getElementById('spotlight');
+            
+            // Hàm cập nhật vị trí spotlight
+            document.addEventListener('mousemove', (e) => {
+                const x = e.clientX;
+                const y = e.clientY;
+                // Cập nhật biến CSS
+                spotlight.style.setProperty('--mouse-x', x + 'px');
+                spotlight.style.setProperty('--mouse-y', y + 'px');
+            });
+        </script>
     """, unsafe_allow_html=True)
 
-# --- 3. HEYGEN COMPONENT (CLEAN VERSION) ---
+# --- 3. HEYGEN COMPONENT (CENTERED FOCUS) ---
 def get_heygen_html_snippet():
     return """
     <!DOCTYPE html>
@@ -87,7 +141,7 @@ def get_heygen_html_snippet():
       <title>HeyGen AI</title>
       <style>
         body, html { margin: 0; padding: 0; background: transparent !important; overflow: hidden; height: 100%; width: 100%; }
-        body { display: flex; justify-content: center; align-items: flex-start; } /* Căn lên trên cùng */
+        body { display: flex; justify-content: center; align-items: center; }
       </style>
     </head>
     <body>
@@ -106,11 +160,11 @@ def get_heygen_html_snippet():
           #heygen-streaming-embed {
               z-index: 9999;
               position: absolute;
-              top: 50px; /* Đẩy xuống một chút để đẹp hơn */
-              left: 50%;
-              transform: translateX(-50%);
+              top: 50%; left: 50%;
+              transform: translate(-50%, -50%);
               
-              width: 170px; height: 170px;
+              /* TRẠNG THÁI THU GỌN: PROFESSIONAL ORB */
+              width: 160px; height: 160px;
               border-radius: 50%;
               overflow: hidden; 
               
@@ -118,30 +172,34 @@ def get_heygen_html_snippet():
               background-size: cover;
               background-position: center 20%;
               
-              border: 4px solid #fff;
-              box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+              /* Viền phát sáng nhẹ kiểu Cyber-Security */
+              border: 2px solid rgba(56, 189, 248, 0.5);
+              box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
               
-              transition: all 0.4s ease;
+              transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
               opacity: 0; visibility: hidden;
               cursor: pointer;
           }
 
+          /* Hiệu ứng Hover: Nổi bật hơn */
           #heygen-streaming-embed:hover {
-              transform: translateX(-50%) scale(1.05);
-              box-shadow: 0 15px 40px rgba(59, 130, 246, 0.3);
-              border-color: #EFF6FF;
+              transform: translate(-50%, -50%) scale(1.08);
+              box-shadow: 0 0 50px rgba(56, 189, 248, 0.4);
+              border-color: #38bdf8;
           }
 
+          /* TRẠNG THÁI MỞ RỘNG: FULL FOCUS */
           #heygen-streaming-embed.expand {
               width: 100% !important; 
               height: 100% !important;
               max-width: 100% !important;
-              border-radius: 0;
-              border: none;
-              box-shadow: none;
-              background: transparent; 
+              border-radius: 12px;
+              border: 1px solid rgba(56, 189, 248, 0.3);
+              background: rgba(15, 23, 42, 0.8); /* Nền tối mờ nhẹ phía sau avatar */
+              backdrop-filter: blur(10px);
               top: 0; left: 0;
               transform: none;
+              box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
           }
 
           #heygen-streaming-container iframe { width: 100%; height: 100%; border: 0; position: absolute; top:0; left:0; }
@@ -183,63 +241,29 @@ def get_heygen_html_snippet():
     </html>
     """
 
-# --- 4. RENDER UI ---
-def render_header():
+# --- 4. MAIN APP ---
+def main():
+    inject_focus_theme()
+
+    # SECTION: Title (Đơn giản, tinh tế)
     st.markdown("""
-        <div class="header-container">
-            <div class="app-title">Audit Intelligence Suite</div>
-            <div class="app-badge">Enterprise Edition v2.1</div>
+        <div class="title-container">
+            <div class="sub-title">Audit Intelligence V3.0</div>
+            <div class="main-title">VIRTUAL AUDIT ASSISTANT</div>
+            <div class="status-pill">
+                <div class="pulse-dot"></div>
+                System Active & Ready to Analyze
+            </div>
         </div>
     """, unsafe_allow_html=True)
 
-def render_welcome_card():
-    # SỬ DỤNG TEXTWRAP.DEDENT ĐỂ XÓA KHOẢNG TRẮNG THỪA
-    # Đảm bảo HTML không bị hiểu nhầm là Code block
-    html_content = textwrap.dedent("""
-        <div class="welcome-box">
-            <div class="welcome-title">Xin chào, Kiểm toán viên.</div>
-            <div style="color: #64748B; margin-bottom: 20px; line-height: 1.5;">
-                Hệ thống AI đã sẵn sàng. Bạn muốn bắt đầu từ đâu? 
-                Chọn tác vụ nhanh bên dưới hoặc kích hoạt <strong>Trợ lý ảo</strong>.
-            </div>
-            
-            <div class="quick-actions-grid">
-                <div class="action-card">
-                    <span class="action-title">📊 Phân tích Báo cáo</span>
-                    <span class="action-desc">Rà soát BCTC & Dòng tiền</span>
-                </div>
-                <div class="action-card">
-                    <span class="action-title">🛡️ Đánh giá Rủi ro</span>
-                    <span class="action-desc">Kiểm tra tuân thủ & Gian lận</span>
-                </div>
-                <div class="action-card">
-                    <span class="action-title">📑 Tra cứu Luật</span>
-                    <span class="action-desc">Quy định VAS & IFRS</span>
-                </div>
-                <div class="action-card">
-                    <span class="action-title">✍️ Soạn thảo Email</span>
-                    <span class="action-desc">Yêu cầu hồ sơ khách hàng</span>
-                </div>
-            </div>
-        </div>
-    """)
-    st.markdown(html_content, unsafe_allow_html=True)
-
-# --- 5. MAIN APP ---
-def main():
-    inject_dashboard_css()
-    render_header()
-
-    col_content, col_avatar = st.columns([1.5, 1])
-
-    with col_content:
-        render_welcome_card()
-        st.info("💡 **Gợi ý:** Có 3 bút toán cần chú ý tại sổ cái tài khoản 642.")
-
-    with col_avatar:
-        # Đã xóa div wrapper gây lỗi layout
-        # Giờ đây component sẽ tự căn chỉnh đẹp mắt
-        components.html(get_heygen_html_snippet(), height=550, scrolling=False)
+    # SECTION: Avatar (Trung tâm)
+    # Dùng 3 cột để căn giữa tuyệt đối
+    col1, col2, col3 = st.columns([1, 6, 1])
+    
+    with col2:
+        # Tăng chiều cao lên 600px để khi mở rộng nhìn rất đã mắt
+        components.html(get_heygen_html_snippet(), height=600, scrolling=False)
 
 if __name__ == "__main__":
     main()
