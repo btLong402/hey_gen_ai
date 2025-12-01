@@ -3,98 +3,139 @@ import streamlit.components.v1 as components
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
-    page_title="Audit Intelligence Assistant",
-    page_icon="xp",
+    page_title="Audit Intelligence Workspace",
+    page_icon="⚖️",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CORPORATE CSS (THE "BIG 4" LOOK) ---
-def inject_corporate_css():
+# --- 2. ADVANCED CSS (DASHBOARD STYLE) ---
+def inject_dashboard_css():
     st.markdown("""
         <style>
-            /* IMPORT PROFESSIONAL FONTS */
-            @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap');
 
-            /* --- BACKGROUND: CLEAN & PROFESSIONAL --- */
+            :root {
+                --primary-color: #0F172A; /* Slate 900 */
+                --accent-color: #3B82F6;  /* Blue 500 */
+                --bg-color: #F8FAFC;      /* Slate 50 */
+                --card-bg: #FFFFFF;
+                --text-main: #334155;
+            }
+
             .stApp {
-                background-color: #f4f6f9; /* Xám xanh nhạt rất dịu mắt */
-                background-image: linear-gradient(135deg, #f4f6f9 0%, #eef2f3 100%);
-                font-family: 'Lato', sans-serif;
-                color: #2c3e50;
+                background-color: var(--bg-color);
+                font-family: 'Inter', sans-serif;
             }
 
-            /* ẨN UI THỪA */
+            /* HIDE DEFAULT ELEMENTS */
             #MainMenu, footer, header {visibility: hidden;}
-            .block-container { padding-top: 3rem; padding-bottom: 0rem; max-width: 100%; }
+            .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
 
-            /* --- HEADER SECTION --- */
-            .audit-header {
-                text-align: center;
-                margin-bottom: 30px;
+            /* --- HEADER --- */
+            .header-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 40px;
+                border-bottom: 2px solid #E2E8F0;
                 padding-bottom: 20px;
-                border-bottom: 1px solid #d1d8e0;
             }
-
-            .audit-title {
-                font-family: 'Playfair Display', serif; /* Font có chân tạo uy quyền */
-                font-size: 2.5rem;
+            .app-title {
+                font-family: 'Playfair Display', serif;
+                font-size: 2rem;
+                color: var(--primary-color);
                 font-weight: 700;
-                color: #0f2027; /* Deep Navy */
-                margin: 0;
-                letter-spacing: 0.5px;
+                letter-spacing: -0.5px;
+            }
+            .app-badge {
+                background: #DBEAFE;
+                color: #1E40AF;
+                padding: 6px 16px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
             }
 
-            .audit-subtitle {
-                font-family: 'Lato', sans-serif;
-                font-size: 0.95rem;
-                color: #57606f;
-                text-transform: uppercase;
-                letter-spacing: 2px;
-                margin-top: 5px;
+            /* --- ACTION CARDS (LEFT SIDE) --- */
+            .welcome-box {
+                background: var(--card-bg);
+                padding: 30px;
+                border-radius: 16px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+                border-left: 6px solid var(--accent-color);
             }
-
-            /* --- PROFESSIONAL CARD --- */
-            .corp-card {
-                background: #ffffff;
-                border-radius: 8px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Bóng đổ rất nhẹ */
-                border-left: 5px solid #205072; /* Đường viền xanh bên trái tạo điểm nhấn */
-                padding: 20px 40px;
-                max-width: 700px;
-                margin: 0 auto 30px auto;
-                text-align: center;
+            .welcome-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: var(--primary-color);
+                margin-bottom: 10px;
             }
-
-            .corp-card p {
-                margin: 0;
-                font-size: 1rem;
-                color: #333;
+            .welcome-text {
+                color: #64748B;
                 line-height: 1.6;
             }
-            
-            .highlight-text {
-                color: #205072;
-                font-weight: 700;
-            }
 
-            /* --- STATUS BADGE --- */
-            .status-badge {
-                display: inline-block;
-                margin-top: 10px;
+            /* --- QUICK ACTIONS GRID --- */
+            .quick-actions-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin-top: 20px;
+            }
+            .action-card {
+                background: white;
+                border: 1px solid #E2E8F0;
+                padding: 20px;
+                border-radius: 12px;
+                cursor: pointer;
+                transition: all 0.2s;
+                text-align: left;
+            }
+            .action-card:hover {
+                border-color: var(--accent-color);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                transform: translateY(-2px);
+            }
+            .action-icon { font-size: 1.5rem; margin-bottom: 10px; display: block; }
+            .action-title { font-weight: 600; color: var(--primary-color); display: block; }
+            .action-desc { font-size: 0.85rem; color: #94A3B8; margin-top: 5px; display: block; }
+
+            /* --- AVATAR CONTAINER (RIGHT SIDE) --- */
+            .avatar-wrapper {
+                background: #FFFFFF;
+                border-radius: 24px;
+                padding: 10px;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                border: 1px solid #F1F5F9;
+                height: 520px; /* Chiều cao cố định để cân đối layout */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            /* Label nhỏ trên avatar */
+            .ai-status {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: rgba(16, 185, 129, 0.1);
+                color: #059669;
                 padding: 4px 12px;
-                background-color: #e8f5e9;
-                color: #2e7d32;
-                border-radius: 100px;
+                border-radius: 12px;
                 font-size: 0.75rem;
-                font-weight: 600;
-                border: 1px solid #c8e6c9;
+                font-weight: 700;
+                z-index: 10;
+                backdrop-filter: blur(4px);
             }
 
         </style>
     """, unsafe_allow_html=True)
 
-# --- 3. HEYGEN COMPONENT (OFFICE STYLE) ---
+# --- 3. HEYGEN COMPONENT (FITTED) ---
 def get_heygen_html_snippet():
     return """
     <!DOCTYPE html>
@@ -116,64 +157,57 @@ def get_heygen_html_snippet():
 
           const wrapDiv = document.createElement("div");
           wrapDiv.id = "heygen-streaming-embed";
-          
           const container = document.createElement("div");
           container.id = "heygen-streaming-container";
 
           const stylesheet = document.createElement("style");
           stylesheet.innerHTML = `
           #heygen-streaming-embed {
-              z-index: 2147483647;
+              z-index: 9999;
               position: absolute;
               top: 50%; left: 50%;
               transform: translate(-50%, -50%);
               
-              /* STYLE CHO TRẠNG THÁI THU GỌN: CHUYÊN NGHIỆP */
-              width: 140px; height: 140px;
+              /* TRẠNG THÁI THU GỌN */
+              width: 160px; height: 160px;
               border-radius: 50%;
               overflow: hidden; 
               
-              /* Ảnh nền */
               background-image: url('https://files2.heygen.ai/avatar/v3/74447a27859a456c955e01f21ef18216_45620/preview_talk_1.webp');
               background-size: cover;
               background-position: center 20%;
               
-              /* Viền kép tạo cảm giác trang trọng */
+              /* Viền tạo cảm giác chuyên nghiệp */
               border: 4px solid #fff;
-              box-shadow: 0 8px 24px rgba(32, 80, 114, 0.25); /* Bóng màu xanh navy */
+              box-shadow: 0 10px 25px rgba(0,0,0,0.1);
               
               transition: all 0.4s ease;
               opacity: 0; visibility: hidden;
               cursor: pointer;
           }
 
-          /* Hiệu ứng Hover nhẹ nhàng, lịch sự */
           #heygen-streaming-embed:hover {
               transform: translate(-50%, -50%) scale(1.05);
-              box-shadow: 0 12px 30px rgba(32, 80, 114, 0.35);
-              border-color: #f1f2f6;
+              box-shadow: 0 15px 35px rgba(59, 130, 246, 0.2); /* Blue shadow */
+              border-color: #EFF6FF;
           }
 
-          /* TRẠNG THÁI MỞ RỘNG (EXPAND) */
+          /* KHI MỞ RỘNG - VỪA KHÍT KHUNG BÊN PHẢI */
           #heygen-streaming-embed.expand {
               width: 100% !important; 
               height: 100% !important;
               max-width: 100% !important;
               max-height: 100% !important;
-              
               border-radius: 0;
               border: none;
               box-shadow: none;
               background: transparent; 
-              background-image: none;
-              
               top: 0; left: 0;
               transform: none;
           }
 
           #heygen-streaming-container { width: 100%; height: 100%; }
           #heygen-streaming-container iframe { width: 100%; height: 100%; border: 0; position: absolute; top:0; left:0; }
-          
           #heygen-streaming-embed.show { opacity: 1; visibility: visible; }
           `;
 
@@ -212,34 +246,71 @@ def get_heygen_html_snippet():
     </html>
     """
 
-# --- 4. MAIN APP ---
+# --- 4. UI HELPER FUNCTIONS ---
+def render_header():
+    st.markdown("""
+        <div class="header-container">
+            <div class="app-title">Audit Intelligence Suite</div>
+            <div class="app-badge">Enterprise Edition v2.0</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+def render_welcome_card():
+    st.markdown("""
+        <div class="welcome-box">
+            <div class="welcome-title">Xin chào, Kiểm toán viên.</div>
+            <div class="welcome-text">
+                Hệ thống AI đã sẵn sàng hỗ trợ. Dữ liệu tài chính Q4 đã được đồng bộ. 
+                Bạn muốn bắt đầu từ đâu? Hãy chọn một tác vụ nhanh hoặc kích hoạt 
+                <strong>Trợ lý ảo</strong> bên tay phải để hội thoại trực tiếp.
+            </div>
+            
+            <div class="quick-actions-grid">
+                <div class="action-card">
+                    <span class="action-icon">📊</span>
+                    <span class="action-title">Phân tích Báo cáo</span>
+                    <span class="action-desc">Rà soát BCTC & Lưu chuyển tiền tệ</span>
+                </div>
+                <div class="action-card">
+                    <span class="action-icon">🛡️</span>
+                    <span class="action-title">Đánh giá Rủi ro</span>
+                    <span class="action-desc">Kiểm tra tuân thủ & Gian lận</span>
+                </div>
+                <div class="action-card">
+                    <span class="action-icon">📑</span>
+                    <span class="action-title">Tra cứu Luật</span>
+                    <span class="action-desc">Quy định VAS & IFRS mới nhất</span>
+                </div>
+                <div class="action-card">
+                    <span class="action-icon">✍️</span>
+                    <span class="action-title">Soạn thảo Email</span>
+                    <span class="action-desc">Gửi yêu cầu cung cấp hồ sơ</span>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+# --- 5. MAIN APP LAYOUT ---
 def main():
-    inject_corporate_css()
+    inject_dashboard_css()
+    render_header()
 
-    # HEADER: Logo và Tên hệ thống
-    st.markdown("""
-        <div class="audit-header">
-            <h1 class="audit-title">AUDIT INTELLIGENCE SUITE</h1>
-            <div class="audit-subtitle">Financial Analysis &bullet; Risk Assurance &bullet; Compliance</div>
-        </div>
-    """, unsafe_allow_html=True)
+    # Layout chia cột: 60% Nội dung - 40% Avatar
+    # Giúp giao diện cân đối, người dùng vừa làm việc vừa chat được
+    col_content, col_avatar = st.columns([1.4, 1])
 
-    # INFO CARD: Hướng dẫn ngắn gọn
-    st.markdown("""
-        <div class="corp-card">
-            <p>Chào bạn, tôi là <span class="highlight-text">Trợ lý Kiểm toán Ảo</span>.</p>
-            <p style="font-size: 0.9rem; color: #666; margin-top: 5px;">
-                Vui lòng nhấn vào hình đại diện bên dưới để bắt đầu phiên tư vấn.
-            </p>
-            <div class="status-badge">● System Online: Secure Connection</div>
-        </div>
-    """, unsafe_allow_html=True)
+    with col_content:
+        render_welcome_card()
+        # Mockup một biểu đồ nhỏ hoặc log để trông giống Dashboard thật
+        st.info("💡 Gợi ý: Hôm nay có 3 bút toán cần chú ý tại sổ cái tài khoản 642.")
 
-    # AVATAR SECTION
-    col1, col2, col3 = st.columns([1, 8, 1])
-    with col2:
-        # height=550 là chuẩn cho desktop làm việc văn phòng
-        components.html(get_heygen_html_snippet(), height=550, scrolling=False)
+    with col_avatar:
+        # Avatar được bọc trong một container riêng biệt, đẹp mắt
+        st.markdown('<div class="avatar-wrapper">', unsafe_allow_html=True)
+        st.markdown('<div class="ai-status">● LIVE</div>', unsafe_allow_html=True)
+        # height 500px là vừa đủ để fit vào khung bên phải
+        components.html(get_heygen_html_snippet(), height=500, scrolling=False)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
