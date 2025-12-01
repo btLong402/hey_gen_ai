@@ -1,92 +1,101 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-# --- 1. SETUP PAGE CONFIG ---
+# --- 1. SETUP PAGE ---
 st.set_page_config(
-    page_title="HeyGen AI Assistant",
-    page_icon="✨",
+    page_title="HeyGen AI Futuristic",
+    page_icon="🧬",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. ADVANCED CSS (THE "BEAUTY" LAYER) ---
-def inject_immersive_css():
+# --- 2. FUTURISTIC UI & MOUSE EFFECT ---
+def inject_sci_fi_css():
     st.markdown("""
         <style>
             /* IMPORT FONT */
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400&display=swap');
 
-            /* RESET & BACKGROUND */
+            /* --- BACKGROUND: CYBER GRID --- */
             .stApp {
-                /* Tạo nền Gradient có chiều sâu thay vì đen kịt */
-                background: radial-gradient(circle at 50% 10%, #1e202e 0%, #000000 100%);
-                font-family: 'Inter', sans-serif;
+                background-color: #050505;
+                background-image: 
+                    linear-gradient(rgba(30, 30, 30, 0.3) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(30, 30, 30, 0.3) 1px, transparent 1px);
+                background-size: 40px 40px; /* Kích thước ô lưới */
+                background-position: center top;
             }
 
-            /* ẨN CÁC THÀNH PHẦN THỪA CỦA STREAMLIT */
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            header {visibility: hidden;}
+            /* --- MOUSE GLOW FOLLOWER (Hiệu ứng con trỏ) --- */
+            /* Ta tạo một div ảo di chuyển theo chuột */
+            #glow-cursor {
+                position: fixed;
+                width: 300px;
+                height: 300px;
+                background: radial-gradient(circle, rgba(0, 255, 255, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+                border-radius: 50%;
+                pointer-events: none; /* Không chặn click chuột */
+                transform: translate(-50%, -50%);
+                z-index: 0;
+                mix-blend-mode: screen;
+                transition: transform 0.1s ease-out; /* Mượt mà */
+            }
+
+            /* ẨN UI THỪA */
+            #MainMenu, footer, header {visibility: hidden;}
+            
+            /* TỐI ƯU LAYOUT */
             .block-container {
-                padding-top: 3rem;
+                padding-top: 2rem;
                 padding-bottom: 0rem;
                 max-width: 100%;
             }
 
-            /* TIÊU ĐỀ CINEMATIC */
-            .hero-title {
+            /* TYPOGRAPHY */
+            .sci-fi-title {
+                font-family: 'Orbitron', sans-serif; /* Font kiểu điện tử */
                 text-align: center;
-                font-size: 3rem;
-                font-weight: 600;
-                background: linear-gradient(90deg, #A1C4FD 0%, #C2E9FB 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                margin-bottom: 0.5rem;
-                letter-spacing: -1px;
-                text-shadow: 0px 4px 12px rgba(0,0,0,0.5);
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: #fff;
+                text-transform: uppercase;
+                letter-spacing: 4px;
+                margin-bottom: 0px;
+                text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
             }
 
-            /* GLASSMORPHISM CARD (HIỆU ỨNG KÍNH) */
-            .glass-card {
-                background: rgba(255, 255, 255, 0.05); /* Trong suốt 5% */
-                backdrop-filter: blur(12px);             /* Làm mờ hậu cảnh */
-                -webkit-backdrop-filter: blur(12px);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 16px;
-                padding: 20px 40px;
+            .sci-fi-subtitle {
+                font-family: 'Inter', sans-serif;
                 text-align: center;
-                max-width: 700px;
-                margin: 0 auto 40px auto; /* Canh giữa */
-                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-                color: #E0E0E0;
+                color: #aaa;
+                font-size: 0.9rem;
+                margin-bottom: 20px;
             }
 
-            .glass-card p {
-                font-size: 1.1rem;
-                margin: 0;
-                line-height: 1.6;
+            /* GLASS CARD COMPACT */
+            .glass-panel {
+                background: rgba(10, 20, 30, 0.6);
+                border: 1px solid rgba(0, 255, 255, 0.2);
+                border-radius: 12px;
+                padding: 10px 30px;
+                display: inline-block;
+                backdrop-filter: blur(5px);
+                box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
             }
 
-            .glass-card .highlight {
-                color: #64B5F6;
-                font-weight: 600;
-            }
-
-            .status-indicator {
-                font-size: 0.85rem;
-                color: #888;
-                margin-top: 10px;
-                display: block;
-            }
-
-            /* TỐI ƯU KHUNG IFRAME */
-            iframe {
-                border: none !important;
-            }
         </style>
+        
+        <div id="glow-cursor"></div>
+        <script>
+            const cursor = document.getElementById('glow-cursor');
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+        </script>
     """, unsafe_allow_html=True)
 
-# --- 3. HEYGEN COMPONENT (CENTERED VERSION) ---
+# --- 3. HEYGEN COMPONENT (RESIZED & CENTERED) ---
 def get_heygen_html_snippet():
     return """
     <!DOCTYPE html>
@@ -96,9 +105,7 @@ def get_heygen_html_snippet():
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>HeyGen AI</title>
       <style>
-        body, html { margin: 0; padding: 0; background-color: transparent; overflow: hidden; font-family: 'Inter', sans-serif; height: 100%; }
-        /* Căn giữa nội dung trong body */
-        body { display: flex; justify-content: center; align-items: center; }
+        body, html { margin: 0; padding: 0; background: transparent; overflow: hidden; height: 100%; display: flex; justify-content: center; align-items: center; }
       </style>
     </head>
     <body>
@@ -107,10 +114,8 @@ def get_heygen_html_snippet():
           const host = "https://labs.heygen.com";
           const url=host+"/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJKdW5lX0hSX3B1YmxpYyIsInByZXZpZXdJ%0D%0AbWciOiJodHRwczovL2ZpbGVzMi5oZXlnZW4uYWkvYXZhdGFyL3YzLzc0NDQ3YTI3ODU5YTQ1NmM5%0D%0ANTVlMDFmMjFlZjE4MjE2XzQ1NjIwL3ByZXZpZXdfdGFsa18xLndlYnAiLCJuZWVkUmVtb3ZlQmFj%0D%0Aa2dyb3VuZCI6ZmFsc2UsImtub3dsZWRnZUJhc2VJZCI6IjYxZGViMDRmMzdmZjRmMmVhMTY0ZGM3%0D%0AMDcyYjcwNWIyIiwidXNlcm5hbWUiOiI5NWJmMjIyOTk4NWQ0MWVlYjAwNWY3ZjUyNzVmZDZjZSJ9&inIFrame=1";
 
-          const clientWidth = document.body.clientWidth;
           const wrapDiv = document.createElement("div");
           wrapDiv.id = "heygen-streaming-embed";
-
           const container = document.createElement("div");
           container.id = "heygen-streaming-container";
 
@@ -119,67 +124,46 @@ def get_heygen_html_snippet():
           #heygen-streaming-embed {
               z-index: 9999;
               position: absolute;
-              
-              /* --- THUẬT TOÁN CĂN GIỮA TUYỆT ĐỐI --- */
-              top: 50%;
-              left: 50%;
+              top: 50%; left: 50%;
               transform: translate(-50%, -50%);
-              /* ------------------------------------- */
               
-              width: 180px;
-              height: 180px;
+              /* KÍCH THƯỚC NÚT TRÒN BAN ĐẦU */
+              width: 140px; height: 140px;
               border-radius: 50%;
+              border: 2px solid rgba(0, 255, 255, 0.5); /* Viền màu Cyan */
+              box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
               
-              border: 2px solid rgba(255, 255, 255, 0.3);
-              box-shadow: 0 0 50px rgba(100, 181, 246, 0.4), inset 0 0 20px rgba(255,255,255,0.1);
-              
-              transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Hiệu ứng nảy (bouncy) */
-              overflow: hidden;
-              opacity: 0;
-              visibility: hidden;
-              
+              transition: all 0.4s ease-in-out;
+              opacity: 0; visibility: hidden;
               background-image: url('https://files2.heygen.ai/avatar/v3/74447a27859a456c955e01f21ef18216_45620/preview_talk_1.webp');
-              background-size: cover;
-              background-position: center;
+              background-size: cover; background-position: center;
               cursor: pointer;
           }
           
-          #heygen-streaming-embed:hover {
-              box-shadow: 0 0 80px rgba(100, 181, 246, 0.8);
-              transform: translate(-50%, -50%) scale(1.1); /* Phóng to từ tâm */
+          /* Hiệu ứng Pulse khi chờ đợi */
+          @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0); }
           }
-
           #heygen-streaming-embed.show {
-              opacity: 1;
-              visibility: visible;
+              opacity: 1; visibility: visible;
+              animation: pulse 2s infinite;
           }
 
+          /* KHI MỞ RỘNG - GIỚI HẠN KÍCH THƯỚC ĐỂ VỪA KHUNG */
           #heygen-streaming-embed.expand {
-              /* Khi mở rộng, vẫn giữ căn giữa và phóng to full khung */
-              width: 100%;
+              width: 100%; 
               height: 100%;
-              max-width: 100%;
-              max-height: 100%;
-              
-              top: 0;
-              left: 0;
-              transform: none; /* Bỏ căn giữa để full màn hình iframe */
-              
-              border-radius: 12px;
-              border: none;
-              background-color: transparent;
-              box-shadow: none;
+              max-width: 800px; /* Giới hạn chiều rộng ngang */
+              border-radius: 10px;
+              border: 1px solid rgba(0, 255, 255, 0.2);
+              box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+              animation: none;
+              background: #000;
           }
 
-          #heygen-streaming-container {
-              width: 100%;
-              height: 100%;
-          }
-          #heygen-streaming-container iframe {
-              width: 100%;
-              height: 100%;
-              border: 0;
-          }
+          #heygen-streaming-container iframe { width: 100%; height: 100%; border: 0; }
           `;
 
           const iframe = document.createElement("iframe");
@@ -216,26 +200,27 @@ def get_heygen_html_snippet():
     </body>
     </html>
     """
-# --- 4. MAIN APP LOGIC ---
+
+# --- 4. MAIN APP ---
 def main():
-    inject_immersive_css()
+    inject_sci_fi_css()
 
-    # SECTION 1: HERO TITLE
-    st.markdown('<div class="hero-title">Virtual AI Assistant</div>', unsafe_allow_html=True)
-
-    # SECTION 2: GLASS CARD INSTRUCTION
-    # Hướng dẫn được đặt trong khung kính mờ sang trọng
+    # Header Section
+    st.markdown('<div class="sci-fi-title">AI CORE INTERFACE</div>', unsafe_allow_html=True)
     st.markdown("""
-        <div class="glass-card">
-            <p>Chào mừng! Hãy nhấn vào <span class="highlight">Vòng tròn Avatar</span> bên dưới để bắt đầu cuộc trò chuyện.</p>
-            <span class="status-indicator">● Ready to connect | Microphone access required</span>
+        <div style="text-align: center;">
+            <div class="glass-panel">
+                <span style="color: #0ff;">SYSTEM READY</span> &nbsp;|&nbsp; CLICK AVATAR TO INITIALIZE
+            </div>
         </div>
     """, unsafe_allow_html=True)
 
-    # SECTION 3: THE AVATAR (CENTER STAGE)
-    # Dùng 1 cột duy nhất, chiều cao full để tạo không gian
-    # height=700 để đảm bảo khi avatar phóng to không bị thanh cuộn cắt
-    components.html(get_heygen_html_snippet(), height=700, scrolling=False)
+    # Avatar Section - ĐIỀU CHỈNH QUAN TRỌNG
+    # Giảm height xuống 520px để vừa vặn màn hình mà không cần cuộn
+    col1, col2, col3 = st.columns([1, 10, 1])
+    
+    with col2:
+        components.html(get_heygen_html_snippet(), height=520, scrolling=False)
 
 if __name__ == "__main__":
     main()
